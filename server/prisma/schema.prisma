@@ -1,0 +1,122 @@
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model BotConfig {
+  id                    String   @id @default(uuid())
+  tokenEncrypted        String
+  clientId              String?
+  clientSecretEncrypted String?
+  status                String   @default("DISCONNECTED")
+  botUsername           String?
+  botAvatar             String?
+  botId                 String?  @unique
+  publicBot             Boolean  @default(true)
+  requireCodeGrant      Boolean  @default(false)
+  messageContentIntent Boolean  @default(false)
+  membersIntent         Boolean  @default(false)
+  presencesIntent       Boolean  @default(false)
+  shardingEnabled       Boolean  @default(false)
+  shardCount            Int      @default(1)
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+}
+
+model Telemetry {
+  id                String   @id @default(uuid())
+  timestamp         DateTime @default(now())
+  hostCpuPercent    Float
+  hostRamPercent    Float
+  hostRamUsedMb     Float
+  hostRamTotalMb    Float
+  nodeHeapUsedMb    Float
+  nodeRssMb         Float
+  eventLoopDelayMs  Float
+  discordPingMs     Int
+  guildCount        Int
+  userCount         Int
+  channelCount      Int
+  roleCount         Int
+  emojiCount        Int
+  eventsPerMinute   Int      @default(0)
+  errorCount        Int      @default(0)
+
+  @@index([timestamp])
+}
+
+model CommandUsage {
+  id           String   @id @default(uuid())
+  commandName  String
+  category     String   @default("Uncategorized")
+  guildId      String?
+  guildName    String?
+  userId       String?
+  userName     String?
+  durationMs   Int
+  success      Boolean  @default(true)
+  errorMessage String?
+  errorStack   String?
+  timestamp    DateTime @default(now())
+
+  @@index([commandName])
+  @@index([timestamp])
+}
+
+model CommandConfig {
+  id              String   @id @default(uuid())
+  commandName     String   @unique
+  category        String   @default("Uncategorized")
+  description     String?
+  permissions     String   @default("[]")
+  cooldownSeconds Int      @default(0)
+  enabled         Boolean  @default(true)
+  isGlobal        Boolean  @default(true)
+  updatedAt       DateTime @updatedAt
+}
+
+model GatewayEvent {
+  id        String   @id @default(uuid())
+  eventName String
+  guildId   String?
+  details   String?
+  timestamp DateTime @default(now())
+
+  @@index([eventName])
+  @@index([timestamp])
+}
+
+model AuditLog {
+  id        String   @id @default(uuid())
+  action    String
+  category  String
+  actor     String   @default("system")
+  ipAddress String?
+  details   String?
+  timestamp DateTime @default(now())
+
+  @@index([timestamp])
+}
+
+model Settings {
+  id                   String   @id @default("global")
+  theme                String   @default("dark")
+  language             String   @default("en")
+  timezone             String   @default("UTC")
+  notificationsEnabled Boolean  @default(true)
+  webhookUrl           String?
+  updatedAt            DateTime @updatedAt
+}
+
+model Session {
+  id        String   @id @default(uuid())
+  token     String   @unique
+  ip        String?
+  userAgent String?
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+}

@@ -1,0 +1,53 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: discord-control-center
+  labels:
+    app: discord-control-center
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: discord-control-center
+  template:
+    metadata:
+      labels:
+        app: discord-control-center
+    spec:
+      containers:
+        - name: control-center
+          image: discord-control-center:latest
+          ports:
+            - containerPort: 3000
+            - containerPort: 5000
+          envFrom:
+            - secretRef:
+                name: control-center-secrets
+          readinessProbe:
+            httpGet:
+              path: /api/ready
+              port: 5000
+            initialDelaySeconds: 10
+            periodSeconds: 5
+          livenessProbe:
+            httpGet:
+              path: /api/live
+              port: 5000
+            initialDelaySeconds: 15
+            periodSeconds: 10
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: discord-control-center-service
+spec:
+  type: ClusterIP
+  selector:
+    app: discord-control-center
+  ports:
+    - name: http-frontend
+      port: 80
+      targetPort: 3000
+    - name: http-backend
+      port: 5000
+      targetPort: 5000

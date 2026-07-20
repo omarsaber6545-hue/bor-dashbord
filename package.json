@@ -1,0 +1,22 @@
+{
+  "name": "discord-bot-control-center",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Enterprise-grade Discord Bot Control Center with real-time telemetry, monitoring, and management",
+  "scripts": {
+    "dev:server": "npm --prefix server run dev",
+    "dev:client": "npm --prefix client run dev",
+    "dev": "npx -y concurrently \"npm run dev:server\" \"npm run dev:client\"",
+    "build:server": "npm --prefix server run build",
+    "build:client": "npm --prefix client run build",
+    "build": "npm run build:server && npm run build:client",
+    "start:server": "npm --prefix server run start",
+    "prisma:generate": "npm --prefix server run prisma:generate",
+    "prisma:push": "npm --prefix server run prisma:push",
+    "install:all": "npm install && npm --prefix server install && npm --prefix client install",
+    "test": "npm --prefix server run test"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}
